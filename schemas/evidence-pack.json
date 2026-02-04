@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/evidence-pack.json",
+  "title": "Evidence Pack (hash-only)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "proto",
+    "ipr_id",
+    "job_hash",
+    "permit_hash",
+    "output_hash",
+    "time",
+    "result"
+  ],
+  "properties": {
+    "proto": { "type": "string", "const": "HBCE-EVIDENCE-PACK-v1" },
+    "ipr_id": { "type": "string", "minLength": 8 },
+    "job_hash": { "type": "string", "minLength": 16 },
+    "permit_hash": { "type": "string", "minLength": 16 },
+    "output_hash": { "type": "string", "minLength": 16 },
+    "time": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ts"],
+      "properties": {
+        "ts": { "type": "string", "minLength": 10 }
+      }
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": { "type": "string", "enum": ["AUTHORIZED", "DENIED"] },
+        "reason_code": { "type": "string" }
+      }
+    }
+  }
+}
