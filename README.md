@@ -13,7 +13,7 @@ In assenza di prova verificabile → **blocco** (fail-closed).
 
 ## Definizione (one-liner)
 
-Un **IPR DataCenter Metrologico** è un’infrastruttura di control-plane che consente
+Un **IPR DataCenter Metrologico** è un’infrastruttura di **control-plane** che consente
 l’esecuzione di azioni digitali, algoritmiche o robotiche **solo se precedute**
 da un Identity Primary Record verificabile ex-ante, operando in regime fail-closed
 e senza custodia di dati personali.
@@ -28,7 +28,7 @@ Questo DataCenter non esercita autorità.
 - non valuta contenuti o finalità;
 - non decide nel merito delle azioni;
 - misura la coerenza tecnica rispetto a un riferimento immutabile (IPR);
-- rende la verifica riproducibile e auditabile nel tempo.
+- rende la verifica **riproducibile**, **deterministica** e **auditabile**.
 
 > La legittimità non è concessa.  
 > È **misurata**.
@@ -48,76 +48,53 @@ In assenza di prova → **nessuna esecuzione**.
 
 ---
 
-## Funzionamento ex-ante
+## Architettura — DataCenter fisico (control-plane / execution-plane)
 
-1. Decisione esterna al DataCenter (umana o istituzionale)
-2. Emissione di un IPR (hash-only)
-3. Richiesta di esecuzione
-4. Misura ex-ante (PASS / FAIL)
-5. Esecuzione consentita o bloccata
-6. Audit opponibile nel tempo
+```txt
+IPR DATACENTER METROLOGICO (HERMETICUM)
+ARCHITETTURA FISICA / LOGICA — FAIL-CLOSED
 
-Il DataCenter **non introduce eccezioni** e **non applica fallback permissivi**.
+            CONTROL-PLANE (METROLOGICO)
++--------------------------------------------------+
+|                                                  |
+|  IPR Reference (hash-only, append-only)          |
+|                                                  |
+|  JOKER Gate / Precheck API                       |
+|  - misura ex-ante                                |
+|  - PASS / FAIL + reason_code                     |
+|  - audit hash-only (append-only)                 |
+|  - nessuna custodia dati                         |
+|                                                  |
++-------------------------+------------------------+
+                          |
+                          | PASS only
+                          | (condizione tecnica)
+                          v
+              EXECUTION-PLANE (DATACENTER)
++--------------------------------------------------+
+|                                                  |
+|  Compute / Jobs / AI / Robot / Automazione       |
+|                                                  |
+|  - esegue SOLO se autorizzato ex-ante             |
+|  - nessun fallback permissivo                    |
+|  - nessuna eccezione manuale                     |
+|                                                  |
++--------------------------------------------------+
+                          ^
+                          |
+                          | FAIL -> BLOCCO
+                          | (nessuna esecuzione)
+                          |
+                audit_event + reason_code
+                (verificabile nel tempo)
 
----
 
-## Cosa fa
+SEPARAZIONE DEI RUOLI (INVARIANTE)
 
-- verifica IPR ex-ante;
-- opera in modalità **fail-closed**;
-- consente l’esecuzione solo in stato PASS;
-- produce evidenze tecniche auditabili;
-- blocca automaticamente in assenza di prova.
+- IPR              = riferimento
+- JOKER / Precheck = misura (control-plane)
+- DataCenter       = esecutore vincolato (execution-plane)
 
-## Cosa NON fa
+REGOLA CANONICA
 
-- non decide nel merito;
-- non custodisce identità o dati personali;
-- non riscrive eventi passati;
-- non esercita discrezionalità;
-- non sostituisce autorità umane o istituzionali.
-
----
-
-## Integrazione nel sistema HERMETICUM
-
-- **IPR** → riferimento
-- **JOKER Gate** → misura ex-ante
-- **Precheck API** → interfaccia tecnica PASS / FAIL
-- **DataCenter Metrologico** → esecuzione vincolata
-
-Il DataCenter è **esecutore condizionato**, non arbitro.
-
----
-
-## Allineamento normativo UE
-
-- **AI Act** → human oversight tecnico reale ex-ante
-- **GDPR** → minimizzazione, hash-only, nessuna custodia dati
-- **NIS2** → prevenzione del rischio a monte
-- **eIDAS (principi)** → tracciabilità e opponibilità nel tempo
-
-Questo repository **non introduce nuove leggi**
-e **non sostituisce autorità esistenti**:
-rende tecnicamente applicabili obblighi già presenti.
-
----
-
-## Stato del progetto
-
-- Architettura: definita
-- Regime: fail-closed
-- Audit: nativo
-- Custodia dati: assente
-- Ambito: B2G / B2B / infrastrutture critiche / AI ad alto impatto
-
----
-
-## Formula canonica
-
-IPR è il riferimento.  
-JOKER è la misura.  
-Il DataCenter è l’esecutore vincolato.  
-
-**Non cambio chi decide.  
-Cambio quando un’azione è ammessa.**
+Assenza di prova verificabile ex-ante  =>  Nessuna esecuzione
